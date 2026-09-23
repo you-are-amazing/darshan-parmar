@@ -43,18 +43,35 @@ const answeredPrompts = {};
 let chatEpoch = 0; // bumped by clearChat() so in-flight replies are dropped
 
 // ---------- Viewport height ----------
-// window.innerHeight does NOT shrink when the mobile virtual keyboard
-// opens (iOS especially), which leaves the composer hidden behind the
-// keys. visualViewport.height tracks the visible area, so we use it
-// when available and re-scroll the chat when it changes.
+// Modern browsers: CSS (100dvh) sizes the app, so nothing to measure.
+// Older browsers without dvh: measure the visible area in JS and re-measure
+// after the keyboard / URL bar settles so the layout never stays stuck at
+// a stale (too short) height.
+const supportsDvh = !!(window.CSS && CSS.supports && CSS.supports('height', '100dvh'));
+
 function setViewportHeight() {
+  const root = document.documentElement;
+  if (supportsDvh) {
+    root.style.removeProperty('--app-vh');
+    return;
+  }
   const vv = window.visualViewport;
-  const h = vv ? vv.height : window.innerHeight;
-  document.documentElement.style.setProperty('--app-vh', `${h}px`);
+  const h = Math.max(vv ? vv.height : 0, window.innerHeight || 0);
+  root.style.setProperty('--app-vh', `${h}px`);
 }
+
+function settleViewportHeight() {
+  setViewportHeight();
+  [120, 350, 700].forEach(ms => setTimeout(setViewportHeight, ms));
+}
+
 setViewportHeight();
+window.addEventListener('load', settleViewportHeight);
 window.addEventListener('resize', setViewportHeight);
-window.addEventListener('orientationchange', setViewportHeight);
+window.addEventListener('orientationchange', settleViewportHeight);
+window.addEventListener('pageshow', settleViewportHeight);
+document.addEventListener('visibilitychange', settleViewportHeight);
+document.addEventListener('focusout', settleViewportHeight);
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', () => {
     setViewportHeight();
