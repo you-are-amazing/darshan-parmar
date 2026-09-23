@@ -4,6 +4,9 @@
 <head>
   <meta charset="UTF-8" />
 
+  <!-- Base target must come BEFORE any URL-referencing tags -->
+  <base target="_blank" />
+
   <!-- viewport-fit=cover: lets safe-area-inset-* work on notched iPhones.
        interactive-widget=resizes-content: makes Android shrink the layout
        when the virtual keyboard opens instead of covering it. -->
@@ -17,7 +20,7 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.0/index.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=7" />
+  <link rel="stylesheet" href="css/style.css?v=8" />
 
   <style>
     /* Profile trigger */
@@ -1225,9 +1228,20 @@
 
   <!-- Chatbot data and behavior -->
 
-  <script src="js/data.js?v=6"></script>
+  <!-- Temporary layout diagnostic: open console, verify, then DELETE this block -->
+  <script>
+    window.addEventListener("load", function () {
+      console.log(
+        "viewport:", window.innerWidth,
+        "| page width:", document.documentElement.scrollWidth,
+        "| overflowing:", document.documentElement.scrollWidth > window.innerWidth
+      );
+    });
+  </script>
 
-  <script src="js/app.js?v=6"></script>
+  <script src="js/data.js?v=7"></script>
+
+  <script src="js/app.js?v=7"></script>
 </body>
 
 </html>

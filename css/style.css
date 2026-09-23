@@ -1748,3 +1748,59 @@ select {
     animation: none;
   }
 }
+
+/* ============================================================
+   MOBILE OVERFLOW GUARD — keep this block at the END of the file
+   ============================================================ */
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
+img, video, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.app {
+  width: 100%;
+}
+
+.app-main, .chat, .messages, .msg, .bubble,
+.bubble-card, .composer, .composer-inner, .prompt-bar {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* flex children must be allowed to shrink below their content size */
+.msg > * {
+  min-width: 0;
+}
+
+/* never let a bot answer force the page wider */
+.bubble-card, .viewer-body, .messages {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 640px) {
+  .msg {
+    gap: 8px;
+  }
+
+  /* 40px avatar + 8px gap — the bubble can never collide
+     with the screen edge, on any device width */
+  .msg.bot .bubble,
+  .msg.user .bubble {
+    max-width: calc(100% - 48px);
+  }
+
+  .prompt-bar {
+    overflow: hidden;
+  }
+
+  .prompt-input {
+    text-overflow: ellipsis;
+  }
+}
