@@ -7,7 +7,7 @@
   <!-- viewport-fit=cover: lets safe-area-inset-* work on notched iPhones.
        interactive-widget=resizes-content: makes Android shrink the layout
        when the virtual keyboard opens instead of covering it. -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
   <meta name="theme-color" content="#430D16" />
 
@@ -17,7 +17,7 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.0/index.css" />
 
-  <link rel="stylesheet" href="css/style.css?v=5" />
+  <link rel="stylesheet" href="css/style.css?v=6" />
 
   <style>
     /* Profile trigger */
@@ -783,7 +783,7 @@
             <!-- Social links menu -->
 
             <div class="prompt-popover social-menu hidden" id="socialMenu" role="menu" aria-label="Social links menu">
-              <a href="/cdn-cgi/l/email-protection#43202c2d2d2620376d272231302b222d3322312e223103242e222a2f6d202c2e" target="_blank" rel="noopener">
+              <a href="mailto:connect.darshanparmar@gmail.com" target="_self">
                 Email
               </a>
 
@@ -827,7 +827,7 @@
 
   <!-- Page interactions -->
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     /* Visitor name and welcome bubble */
 
     (function () {
@@ -1064,6 +1064,11 @@
          * name modal.
          */
 
+        /* close the keyboard so the layout returns to full height */
+        if (document.activeElement && document.activeElement.blur) {
+          document.activeElement.blur();
+        }
+
         nameModal.style.opacity = "0";
 
         nameModal.style.transition = "opacity 0.25s ease";
@@ -1220,9 +1225,9 @@
 
   <!-- Chatbot data and behavior -->
 
-  <script src="js/data.js?v=5"></script>
+  <script src="js/data.js?v=6"></script>
 
-  <script src="js/app.js?v=5"></script>
+  <script src="js/app.js?v=6"></script>
 </body>
 
 </html>
