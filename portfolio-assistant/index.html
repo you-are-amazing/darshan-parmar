@@ -1,0 +1,1228 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- viewport-fit=cover: lets safe-area-inset-* work on notched iPhones.
+       interactive-widget=resizes-content: makes Android shrink the layout
+       when the virtual keyboard opens instead of covering it. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content" />
+
+  <meta name="theme-color" content="#430D16" />
+
+  <title>Darshan A. Parmar — Software QA Engineer</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/fraunces@5.0.0/index.css" />
+
+  <link rel="stylesheet" href="css/style.css?v=5" />
+
+  <style>
+    /* Profile trigger */
+
+    .profile-trigger {
+      width: 46px;
+      height: 46px;
+
+      padding: 2px;
+
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+
+      background: var(--paper);
+
+      cursor: pointer;
+
+      overflow: hidden;
+
+      display: grid;
+      place-items: center;
+
+      flex: none;
+
+      box-shadow: var(--shadow-sm);
+
+      transition:
+        transform 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+
+      /* removes the grey flash on tap (mobile) */
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .profile-trigger:hover {
+      transform: translateY(-1px);
+
+      border-color: var(--maroon-600);
+
+      box-shadow: var(--shadow-md);
+    }
+
+    .profile-trigger:focus-visible {
+      outline: 3px solid rgba(122, 31, 43, 0.18);
+      outline-offset: 2px;
+    }
+
+    .profile-image {
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+
+      border-radius: 9px;
+
+      display: block;
+    }
+
+    /* Profile modal */
+
+    .profile-modal-overlay {
+      position: fixed;
+      inset: 0;
+
+      z-index: 200;
+
+      display: grid;
+      place-items: center;
+
+      /* safe-area padding so the modal never sits under notches */
+      padding: calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+
+      background: rgba(33, 22, 19, 0.62);
+
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      pointer-events: none;
+
+      transition:
+        opacity 0.22s ease,
+        visibility 0.22s ease;
+    }
+
+    .profile-modal-overlay.open {
+      opacity: 1;
+
+      visibility: visible;
+
+      pointer-events: auto;
+    }
+
+    .profile-modal {
+      position: relative;
+
+      width: min(430px, 100%);
+
+      max-height: min(90vh, 720px);
+
+      overflow-y: auto;
+
+      background: var(--paper);
+
+      border: 1px solid var(--line);
+
+      border-radius: 22px;
+
+      padding: 18px;
+
+      box-shadow: 0 24px 70px rgba(33, 22, 19, 0.24);
+
+      transform: translateY(12px) scale(0.97);
+
+      transition: transform 0.25s ease;
+
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .profile-modal-overlay.open .profile-modal {
+      transform: translateY(0) scale(1);
+    }
+
+    /* Profile modal close button */
+
+    .profile-modal-close {
+      position: absolute;
+
+      top: 12px;
+      right: 12px;
+
+      z-index: 2;
+
+      width: 36px;
+      height: 36px;
+
+      border: 1px solid rgba(255, 255, 255, 0.7);
+
+      border-radius: 50%;
+
+      background: rgba(33, 22, 19, 0.62);
+
+      color: #fff;
+
+      display: grid;
+      place-items: center;
+
+      cursor: pointer;
+
+      font-size: 24px;
+
+      line-height: 1;
+
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .profile-modal-close:hover {
+      background: var(--maroon-800);
+
+      transform: scale(1.04);
+    }
+
+    .profile-modal-close:focus-visible {
+      outline: 3px solid rgba(122, 31, 43, 0.2);
+
+      outline-offset: 2px;
+    }
+
+    /* Profile modal image */
+
+    .profile-modal-image-wrap {
+      width: 100%;
+
+      aspect-ratio: 494 / 621;
+
+      overflow: hidden;
+
+      border-radius: 16px;
+
+      background: var(--paper-soft-2);
+
+      border: 1px solid var(--line);
+    }
+
+    .profile-modal-image {
+      width: 100%;
+      height: 100%;
+
+      display: block;
+
+      object-fit: cover;
+    }
+
+    /* Profile modal content */
+
+    .profile-modal-content {
+      padding: 22px 10px 8px;
+
+      text-align: center;
+    }
+
+    .profile-modal-content h2 {
+      margin: 0 0 10px;
+
+      color: var(--maroon-900);
+
+      font-family: var(--serif);
+
+      font-size: clamp(1.4rem, 4vw, 1.75rem);
+
+      line-height: 1.2;
+
+      letter-spacing: -0.01em;
+    }
+
+    /* Small gradient role badge under the name */
+
+    .profile-modal-badge {
+      display: inline-block;
+
+      padding: 5px 14px;
+
+      border-radius: 999px;
+
+      background: linear-gradient(135deg, var(--maroon-700), var(--maroon-900));
+
+      color: #fff;
+
+      font-family: var(--sans);
+
+      font-size: 0.78rem;
+
+      font-weight: 600;
+
+      letter-spacing: 0.04em;
+
+      text-transform: uppercase;
+
+      box-shadow: 0 2px 8px rgba(122, 31, 43, 0.25);
+
+      margin-bottom: 14px;
+    }
+
+    /* Friendly lead-in line */
+
+    .profile-modal-lead {
+      margin: 0 0 10px !important;
+
+      color: var(--ink) !important;
+
+      font-family: var(--serif);
+
+      font-size: 1.02rem;
+
+      font-weight: 500;
+    }
+
+    .profile-modal-content p {
+      margin: 0 auto;
+
+      max-width: 350px;
+
+      color: var(--ink-soft);
+
+      font-size: 0.95rem;
+
+      line-height: 1.65;
+    }
+
+    .profile-modal-content p strong {
+      color: var(--maroon-700);
+
+      font-weight: 600;
+    }
+
+    /* Personalized welcome bubble */
+
+    .welcome-notification {
+      position: fixed;
+
+      top: 78px;
+
+      left: max(24px, calc((100vw - 1100px) / 2));
+
+      z-index: 150;
+
+      width: min(390px, calc(100vw - 32px));
+
+      display: block;
+
+      pointer-events: none;
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      transform: translateY(-14px) translateX(-8px) scale(0.97);
+
+      transform-origin: top left;
+
+      /* keep the bubble off the notch on iPhones */
+      margin-left: env(safe-area-inset-left);
+      margin-right: env(safe-area-inset-right);
+    }
+
+    .welcome-notification.show {
+      animation: welcomeNotificationIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .welcome-notification.hide {
+      animation: welcomeNotificationOut 0.35s ease forwards;
+    }
+
+    .welcome-notification-avatar {
+      display: none;
+    }
+
+    /* Welcome bubble content */
+
+    .welcome-notification-bubble {
+      position: relative;
+
+      min-width: 0;
+
+      padding: 12px 14px;
+
+      background: var(--paper);
+
+      border: 1px solid var(--line);
+
+      border-radius: 15px;
+
+      box-shadow: var(--shadow-lg);
+
+      color: var(--ink);
+    }
+
+    .welcome-notification-bubble::before {
+      content: "";
+
+      position: absolute;
+
+      top: -7px;
+
+      left: var(--notif-tail-left, 24px);
+
+      width: 12px;
+      height: 12px;
+
+      background: var(--paper);
+
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+
+      transform: rotate(45deg);
+    }
+
+    /* Welcome bubble label */
+
+    .welcome-notification-label {
+      position: relative;
+
+      margin-bottom: 3px;
+
+      color: var(--maroon-700);
+
+      font-size: 0.72rem;
+
+      font-weight: 700;
+
+      letter-spacing: 0.02em;
+
+      text-transform: uppercase;
+    }
+
+    /* Welcome bubble message */
+
+    .welcome-notification-text {
+      position: relative;
+
+      margin: 0;
+
+      font-size: 0.88rem;
+
+      line-height: 1.5;
+
+      color: var(--ink-soft);
+    }
+
+    .welcome-notification-text strong {
+      color: var(--ink);
+
+      font-weight: 700;
+    }
+
+    /* Welcome bubble close button */
+
+    .welcome-notification-close {
+      position: absolute;
+
+      top: 5px;
+      right: 7px;
+
+      width: 26px;
+      height: 26px;
+
+      border: 0;
+
+      background: transparent;
+
+      color: var(--ink-faint);
+
+      cursor: pointer;
+
+      font-size: 17px;
+
+      line-height: 1;
+
+      padding: 0;
+
+      pointer-events: auto;
+
+      /* bigger, easier tap target on phones */
+      display: grid;
+      place-items: center;
+
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .welcome-notification-close:hover {
+      color: var(--maroon-700);
+    }
+
+    /* Welcome bubble entrance */
+
+    @keyframes welcomeNotificationIn {
+      0% {
+        opacity: 0;
+
+        visibility: visible;
+
+        transform: translateY(-18px) translateX(-18px) scale(0.82);
+      }
+
+      45% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 1;
+
+        visibility: visible;
+
+        transform: translateY(0) translateX(0) scale(1);
+      }
+    }
+
+    /* Welcome bubble exit */
+
+    @keyframes welcomeNotificationOut {
+      0% {
+        opacity: 1;
+
+        visibility: visible;
+
+        transform: translateY(0) translateX(0) scale(1);
+      }
+
+      100% {
+        opacity: 0;
+
+        visibility: hidden;
+
+        transform: translateY(-8px) translateX(-5px) scale(0.97);
+      }
+    }
+
+    /* Responsive adjustments */
+
+    @media (max-width: 640px) {
+      .profile-trigger {
+        width: 42px;
+        height: 42px;
+
+        border-radius: 11px;
+      }
+
+      .profile-modal-overlay {
+        padding: calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
+      }
+
+      .profile-modal {
+        border-radius: 18px;
+
+        padding: 12px;
+      }
+
+      .profile-modal-image-wrap {
+        border-radius: 13px;
+      }
+
+      .profile-modal-content {
+        padding: 18px 7px 6px;
+      }
+
+      .welcome-notification {
+        top: 68px;
+
+        left: 16px;
+
+        width: calc(100vw - 32px - env(safe-area-inset-left) - env(safe-area-inset-right));
+      }
+    }
+
+    /* Reduced motion */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .profile-trigger,
+      .profile-modal-overlay,
+      .profile-modal,
+      .welcome-notification,
+      .welcome-notification-avatar {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .welcome-notification.show {
+        opacity: 1;
+
+        visibility: visible;
+
+        transform: none;
+      }
+    }
+  </style>
+<base target="_blank">
+</head>
+
+<body>
+  <!-- Visitor name modal -->
+
+  <div class="modal-overlay" id="nameModal">
+    <div class="modal">
+      <form id="nameForm" novalidate>
+        <h2>Welcome</h2>
+
+        <p>Before we begin, What should I call you?</p>
+
+        <input type="text" class="modal-input" id="nameInput" placeholder="Your name" autocomplete="name"
+          maxlength="30" />
+
+        <button type="submit" class="modal-btn" id="nameSubmit">
+          Continue
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Personalized welcome bubble -->
+
+  <div class="welcome-notification" id="welcomeNotification" role="status" aria-live="polite" aria-hidden="true">
+    <div class="welcome-notification-avatar">
+      <img src="darshan.jpg" alt="Darshan Parmar" />
+    </div>
+
+    <div class="welcome-notification-bubble">
+      <button class="welcome-notification-close" id="welcomeNotificationClose" type="button"
+        aria-label="Close welcome message">
+        &times;
+      </button>
+
+      <div class="welcome-notification-label">Darshan</div>
+
+      <p class="welcome-notification-text" id="welcomeNotificationText"></p>
+    </div>
+  </div>
+
+  <!-- Profile photo modal -->
+
+  <div class="profile-modal-overlay" id="profileModal" aria-hidden="true">
+    <div class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+      <button class="profile-modal-close" id="profileModalClose" type="button" aria-label="Close profile">
+        <span aria-hidden="true"> &times; </span>
+      </button>
+
+      <div class="profile-modal-image-wrap">
+        <img src="darshan.jpg" alt="Darshan Parmar" class="profile-modal-image" />
+      </div>
+
+      <div class="profile-modal-content">
+        <h2 id="profileModalTitle">Hello, I'm Darshan Parmar</h2>
+
+        <span class="profile-modal-badge">Computer Engineer</span>
+
+        <p class="profile-modal-lead">
+          Welcome to my corner of the web 👋
+        </p>
+
+        <p>
+          Chat with my bot to explore my <strong>work</strong>, <strong>projects</strong>,
+          <strong>research</strong>, and <strong>experience</strong> or just say hi on my Gmail.
+          Thank you for stopping by!
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content viewer panel (blog posts, repo previews) -->
+
+  <div class="viewer-overlay" id="viewerOverlay" aria-hidden="true">
+    <div class="viewer-panel" role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
+      <div class="viewer-header">
+        <div class="viewer-header-left">
+          <span class="viewer-icon" id="viewerIcon">📄</span>
+          <div class="viewer-title-wrap">
+            <div class="viewer-title" id="viewerTitle">Title</div>
+            <div class="viewer-subtitle" id="viewerSubtitle"></div>
+          </div>
+        </div>
+        <div class="viewer-header-actions">
+          <a class="viewer-action-btn" id="viewerExternalLink" href="#" target="_blank" rel="noopener"
+            title="Open externally">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+            <span>Open externally</span>
+          </a>
+
+          <button class="viewer-action-btn viewer-close" id="viewerClose" type="button" aria-label="Close"
+            title="Close">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="viewer-body" id="viewerBody"></div>
+    </div>
+  </div>
+
+  <!-- Application shell -->
+
+  <div class="app" id="appRoot">
+    <!-- Sidebar: prompt history -->
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <button class="sidebar-toggle" id="sidebarToggle" type="button" title="Hide history" aria-label="Hide history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <line x1="9" y1="4" x2="9" y2="20" />
+          </svg>
+        </button>
+
+        <span class="sidebar-title">History</span>
+      </div>
+
+      <div class="sidebar-list" id="sidebarList">
+        <div class="sidebar-empty" id="sidebarEmpty">
+          Topics you ask about will show up here, in order.
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="clear-chat-btn" id="clearChatBtn" type="button" title="Clear chat" aria-label="Clear chat">
+          <span class="clear-chat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M4 7h16" />
+              <path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+              <path d="M6 7l.8 11.2A2 2 0 0 0 8.8 20h6.4a2 2 0 0 0 2-1.8L18 7" />
+              <path d="M10 11v5M14 11v5" />
+            </svg>
+          </span>
+          <span class="clear-chat-label">Clear chat</span>
+        </button>
+      </div>
+    </aside>
+
+    <button class="sidebar-open-btn" id="sidebarOpenBtn" type="button" title="Show history" aria-label="Show history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <line x1="9" y1="4" x2="9" y2="20" />
+      </svg>
+    </button>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="app-main">
+      <!-- Header -->
+
+      <header class="site-header">
+        <div class="header-inner">
+          <div class="brand">
+            <!-- Profile photo trigger -->
+
+            <button class="profile-trigger" id="profileTrigger" type="button" aria-label="Open Darshan Parmar profile">
+              <img src="darshan.jpg" alt="Darshan Parmar" class="profile-image" />
+            </button>
+
+            <!-- Profile identity -->
+
+            <div class="brand-text">
+              <div class="name">Darshan A. Parmar</div>
+
+              <div class="role">Computer Engineer · Bharuch, Gujarat</div>
+            </div>
+          </div>
+
+          <!-- Availability status -->
+
+          <div class="status">
+            <span class="status-dot"></span>
+
+            <span> Currently working as a Software QA Engineer </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Chat workspace -->
+
+      <section class="chat is-empty">
+        <div class="messages" id="messages">
+          <!-- Chat welcome -->
+
+          <div class="welcome" id="welcome">
+            <div class="big-mark">
+              <video class="big-mark-logo" autoplay loop muted playsinline preload="auto" aria-label="Darshan Parmar logo">
+                <source src="logoanimation.mp4" type="video/mp4" />
+              </video>
+            </div>
+
+            <h1>Hi, I'm Darshan Parmar 👋</h1>
+
+            <p>
+              Pick a topic below to learn about my work, experience, research,
+              or to get in touch.
+            </p>
+          </div>
+        </div>
+
+        <!-- Composer -->
+
+        <div class="composer">
+          <div class="composer-inner">
+            <!-- Social links menu -->
+
+            <div class="prompt-popover social-menu hidden" id="socialMenu" role="menu" aria-label="Social links menu">
+              <a href="/cdn-cgi/l/email-protection#43202c2d2d2620376d272231302b222d3322312e223103242e222a2f6d202c2e" target="_blank" rel="noopener">
+                Email
+              </a>
+
+              <a href="https://www.linkedin.com/in/-darshan-a-parmar/" target="_blank" rel="noopener">
+                LinkedIn
+              </a>
+            </div>
+
+            <!-- Prompt suggestions -->
+
+            <div class="prompt-popover suggestions-panel hidden" id="suggestionsPanel" role="listbox"
+              aria-label="Suggested prompts"></div>
+
+            <!-- Prompt bar -->
+
+            <div class="prompt-bar">
+              <button class="attach-btn" id="attachBtn" title="Open social links" aria-label="Open social links">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+
+              <input type="text" class="prompt-input" id="promptInput"
+                placeholder="Select a topic to ask about Darshan..." autocomplete="off" spellcheck="false" readonly
+                inputmode="none"
+                role="combobox" aria-controls="suggestionsPanel" aria-haspopup="listbox" aria-expanded="false" />
+
+              <button class="send-btn" id="sendBtn" disabled title="Send" aria-label="Send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Page interactions -->
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    /* Visitor name and welcome bubble */
+
+    (function () {
+      const nameModal = document.getElementById("nameModal");
+
+      const nameForm = document.getElementById("nameForm");
+
+      const nameInput = document.getElementById("nameInput");
+
+      const notification = document.getElementById("welcomeNotification");
+
+      const notificationText = document.getElementById(
+        "welcomeNotificationText",
+      );
+
+      const notificationClose = document.getElementById(
+        "welcomeNotificationClose",
+      );
+
+      const profileTrigger = document.getElementById("profileTrigger");
+
+      if (
+        !nameModal ||
+        !nameForm ||
+        !nameInput ||
+        !notification ||
+        !notificationText
+      ) {
+        return;
+      }
+
+      let notificationTimer = null;
+
+      let typingTimer = null;
+
+      /* Read the saved visitor name. */
+
+      function getVisitorName() {
+        try {
+          return localStorage.getItem("portfolio_visitor_name") || "";
+        } catch (err) {
+          return "";
+        }
+      }
+
+      /* Escape visitor text before inserting it into the message. */
+
+      function escapeHtml(value) {
+        return value
+
+          .replace(/&/g, "&amp;")
+
+          .replace(/</g, "&lt;")
+
+          .replace(/>/g, "&gt;")
+
+          .replace(/"/g, "&quot;")
+
+          .replace(/'/g, "&#039;");
+      }
+
+      /* Hide the welcome bubble. */
+
+      function hideNotification() {
+        clearTimeout(notificationTimer);
+
+        clearTimeout(typingTimer);
+
+        notification.classList.remove("show");
+
+        notification.classList.add("hide");
+
+        notification.setAttribute("aria-hidden", "true");
+
+        setTimeout(function () {
+          notification.classList.remove("hide");
+        }, 380);
+      }
+
+      /* Anchor the bubble to the actual profile photo, wherever it
+         currently renders (this keeps it correct even with the sidebar
+         open, which shifts the header sideways). */
+
+      function positionNotification() {
+        if (!profileTrigger) return;
+
+        const rect = profileTrigger.getBoundingClientRect();
+        const bubbleWidth = Math.min(390, window.innerWidth - 32);
+        const gap = 12;
+
+        let left = rect.left;
+        const maxLeft = window.innerWidth - bubbleWidth - 16;
+        if (left > maxLeft) left = Math.max(16, maxLeft);
+        if (left < 16) left = 16;
+
+        notification.style.left = left + "px";
+        notification.style.top = rect.bottom + gap + "px";
+
+        /* Point the little triangle at the avatar's actual center. */
+        const avatarCenterX = rect.left + rect.width / 2;
+        const tailLeft = Math.max(
+          16,
+          Math.min(bubbleWidth - 28, avatarCenterX - left - 6),
+        );
+        notification.style.setProperty("--notif-tail-left", tailLeft + "px");
+      }
+
+      /* Show the personalized welcome bubble. */
+
+      function showWelcomeNotification(visitorName) {
+        const safeName =
+          visitorName && visitorName.trim() ? visitorName.trim() : "there";
+
+        clearTimeout(notificationTimer);
+
+        clearTimeout(typingTimer);
+
+        positionNotification();
+
+        notification.classList.remove("hide");
+
+        notification.classList.remove("show");
+
+        notification.setAttribute("aria-hidden", "false");
+
+        notificationText.innerHTML = "";
+
+        /*
+         * Force the browser to restart
+         * the entrance animation.
+         */
+
+        void notification.offsetWidth;
+
+        notification.classList.add("show");
+
+        /*
+         * Personalized message.
+         */
+
+        const fullMessage =
+          "Hello <strong>" +
+          escapeHtml(safeName) +
+          "</strong>, welcome to my site. Feel free to explore and chat with my bot to know more about me.";
+
+        /*
+         * Typewriter effect.
+         */
+
+        let index = 0;
+
+        const typingSpeed = 12;
+
+        function typeNext() {
+          if (index >= fullMessage.length) {
+            return;
+          }
+
+          /*
+           * Keep HTML tags together.
+           */
+
+          if (fullMessage.slice(index, index + 8) === "<strong>") {
+            notificationText.innerHTML += "<strong>";
+
+            index += 8;
+          } else if (fullMessage.slice(index, index + 9) === "</strong>") {
+            notificationText.innerHTML += "</strong>";
+
+            index += 9;
+          } else {
+            notificationText.innerHTML += fullMessage[index];
+
+            index += 1;
+          }
+
+          typingTimer = setTimeout(typeNext, typingSpeed);
+        }
+
+        typeNext();
+
+        /*
+         * Keep notification visible
+         * long enough to read.
+         */
+
+        notificationTimer = setTimeout(function () {
+          hideNotification();
+        }, 9000);
+      }
+
+      window.addEventListener("resize", function () {
+        if (notification.classList.contains("show")) {
+          positionNotification();
+        }
+      });
+
+      /* Complete name entry and unlock the page. */
+
+      function finishNameEntry() {
+        const name = nameInput.value.trim();
+
+        /*
+         * Don't allow an empty name.
+         */
+
+        if (!name) {
+          nameInput.style.borderColor = "#c0392b";
+
+          nameInput.focus();
+
+          setTimeout(function () {
+            nameInput.style.borderColor = "";
+          }, 1200);
+
+          return;
+        }
+
+        /*
+         * Save visitor name.
+         */
+
+        try {
+          localStorage.setItem("portfolio_visitor_name", name);
+        } catch (err) {
+          /*
+           * Storage may be unavailable
+           * in restricted browser contexts.
+           */
+        }
+
+        /*
+         * Fade out the initial
+         * name modal.
+         */
+
+        nameModal.style.opacity = "0";
+
+        nameModal.style.transition = "opacity 0.25s ease";
+
+        setTimeout(function () {
+          nameModal.style.display = "none";
+
+          nameModal.remove();
+
+          document.body.style.overflow = "";
+
+          /*
+           * Wait a little so the visitor
+           * sees the portfolio first.
+           *
+           * Then the profile notification
+           * enters from the top-left.
+           */
+
+          setTimeout(function () {
+            showWelcomeNotification(name);
+          }, 220);
+        }, 260);
+      }
+
+      /* Name form */
+
+      nameForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        finishNameEntry();
+      });
+
+      /* Welcome bubble close button */
+
+      if (notificationClose) {
+        notificationClose.addEventListener("click", hideNotification);
+      }
+
+      /* Initialize the visitor experience. */
+
+      const existingName = getVisitorName();
+
+      try {
+        /*
+         * Returning visitor.
+         */
+
+        if (existingName) {
+          nameModal.style.display = "none";
+
+          document.body.style.overflow = "";
+
+          /*
+           * Show personalized greeting
+           * shortly after page loads.
+           */
+
+          setTimeout(function () {
+            showWelcomeNotification(existingName);
+          }, 700);
+        } else {
+          /*
+           * New visitor.
+           */
+          document.body.style.overflow = "hidden";
+
+          setTimeout(function () {
+            nameInput.focus();
+          }, 100);
+        }
+      } catch (err) {
+        document.body.style.overflow = "hidden";
+
+        setTimeout(function () {
+          nameInput.focus();
+        }, 100);
+      }
+    })();
+
+    /* Profile photo modal */
+
+    (function () {
+      const trigger = document.getElementById("profileTrigger");
+
+      const modal = document.getElementById("profileModal");
+
+      const closeButton = document.getElementById("profileModalClose");
+
+      if (!trigger || !modal || !closeButton) {
+        return;
+      }
+
+      let previousActiveElement = null;
+
+      /* Open profile modal */
+
+      function openProfileModal() {
+        previousActiveElement = document.activeElement;
+
+        modal.classList.add("open");
+
+        modal.setAttribute("aria-hidden", "false");
+
+        document.body.style.overflow = "hidden";
+
+        requestAnimationFrame(function () {
+          closeButton.focus();
+        });
+      }
+
+      /* Close profile modal */
+
+      function closeProfileModal() {
+        modal.classList.remove("open");
+
+        modal.setAttribute("aria-hidden", "true");
+
+        document.body.style.overflow = "";
+
+        if (
+          previousActiveElement &&
+          typeof previousActiveElement.focus === "function"
+        ) {
+          previousActiveElement.focus();
+        }
+      }
+
+      /* Profile trigger */
+
+      trigger.addEventListener("click", openProfileModal);
+
+      /* Close button */
+
+      closeButton.addEventListener("click", closeProfileModal);
+
+      /* Close when clicking the backdrop */
+
+      modal.addEventListener("click", function (event) {
+        if (event.target === modal) {
+          closeProfileModal();
+        }
+      });
+
+      /* Close with Escape */
+
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && modal.classList.contains("open")) {
+          closeProfileModal();
+        }
+      });
+    })();
+  </script>
+
+  <!-- Chatbot data and behavior -->
+
+  <script src="js/data.js?v=5"></script>
+
+  <script src="js/app.js?v=5"></script>
+</body>
+
+</html>
